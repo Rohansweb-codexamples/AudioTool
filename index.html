@@ -94,7 +94,7 @@ function reloadEdited(){audio.src=URL.createObjectURL(bufferToWav(buffer));audio
 function paste(){if(!buffer||!clipboard)return alert("Copy a waveform selection first.");const at=Math.floor(audio.currentTime*buffer.sampleRate);applyEdit(b=>spliceBuffer(b,at,at,clipboard))}
 function trimTo(){if(!buffer||!selection)return alert("Select a waveform region first.");const s=Math.floor(selection.start*buffer.sampleRate),e=Math.floor(selection.end*buffer.sampleRate);applyEdit(b=>{const out=makeBuffer(b.numberOfChannels,e-s,b.sampleRate);for(let c=0;c<b.numberOfChannels;c++)out.copyToChannel(b.getChannelData(c).slice(s,e),c);return out})}
 function silence(){if(!buffer||!selection)return alert("Select a waveform region first.");applyEdit(b=>{const out=makeBuffer(b.numberOfChannels,b.length,b.sampleRate);for(let c=0;c<b.numberOfChannels;c++){out.copyToChannel(b.getChannelData(c),c);out.getChannelData(c).fill(0,Math.floor(selection.start*b.sampleRate),Math.floor(selection.end*b.sampleRate))}return out})}
-let recordContext=null,recordProcessor=null,recordGain=null,recordedChunks=[],micStream=null;
+let recordContext=null,recordProcessor=null,recordGain=null,recordedChunks=[];
 async function record(){
  if(recordContext){await stopRecord();return}
  try{
