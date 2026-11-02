@@ -58,6 +58,42 @@ input:focus-visible,button:focus-visible{outline:2px solid #ff70b3;outline-offse
 @media(max-width:850px){.side{min-height:0}}
 @media(max-width:520px){.shell{padding:12px}.visual-wrap{height:175px}}
 
+
+/* Desktop audio-editor ribbon layout */
+body{background:#08080d;color:#f7f3fa}
+.shell{max-width:none;padding:0}
+.top{display:none}
+.ribbon{background:#111118;border-bottom:1px solid #383440;box-shadow:0 8px 25px #0008;position:relative;z-index:4}
+.ribbon-brand{height:42px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#09090e;border-bottom:1px solid #292632}
+.ribbon-brand b{font-size:14px;letter-spacing:.2px}.ribbon-mark{width:25px;height:25px;border-radius:8px;background:linear-gradient(135deg,#ff4fa3,#ffe36a);color:#16121a;display:grid;place-items:center;font-weight:900}
+.ribbon-file{margin-left:auto;color:#9e98a8;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs{height:43px;display:flex;align-items:stretch;gap:0;padding:0 12px;overflow-x:auto;background:#191821}
+.tab{flex:none;padding:0 22px;border:0;border-bottom:3px solid transparent;background:transparent;color:#d6d0dd;font-weight:650}
+.tab:hover{background:#282330}.tab.active{color:#fff;border-bottom-color:#ff70b3;background:#302431}
+.toolstrip{min-height:88px;display:flex;align-items:stretch;gap:7px;padding:9px 13px;background:#20202a;overflow-x:auto}
+.tool-group{display:flex;align-items:stretch;gap:5px;padding-right:10px;border-right:1px solid #3a3642;flex:none}
+.tool-action{min-width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 9px;border:1px solid transparent;border-radius:11px;background:transparent;color:#e9e3ee;font-size:11px}
+.tool-action:hover{background:#342838;border-color:#65445b}
+.tool-action .tool-icon{font-size:20px;line-height:1.1;color:#ff9acb}
+.tool-action.primary{background:linear-gradient(135deg,#ff4fa3,#ff9b8a 55%,#ffe36a);color:#19121a;font-weight:800}
+.tool-action.primary .tool-icon{color:#25151e}
+.layout{grid-template-columns:260px minmax(0,1fr);gap:12px;padding:12px;align-items:stretch}
+.side{min-height:calc(100vh - 205px);border-radius:14px}
+.workspace{gap:12px;min-width:0}
+.hero{display:none}
+.studio{border-radius:14px;padding:16px;background:#111118}
+.now{margin-bottom:12px}.cover{width:48px;height:48px;border-radius:12px;font-size:23px}
+.now h3{font-size:15px}
+.visual-wrap{height:clamp(250px,42vh,480px);background:#08080e;border-color:#373340;border-radius:10px}
+.visual-wrap canvas{cursor:crosshair}
+.visual-label{color:#b0a8b8}
+.timeline{margin-top:10px}
+.trim{border-radius:14px;padding:15px}
+.controls{margin:12px 0}
+.footer{display:none}
+.ribbon button:focus-visible{outline:2px solid #ff70b3;outline-offset:-2px}
+@media(max-width:850px){.layout{grid-template-columns:1fr;padding:8px}.side{min-height:0}.track-list{max-height:170px}.toolstrip{min-height:76px}.tab{padding:0 16px}}
+@media(max-width:520px){.ribbon-brand{padding:0 10px}.tabs{padding:0 4px}.tab{padding:0 13px;font-size:12px}.toolstrip{padding:6px}.tool-action{min-width:56px;padding:6px}.layout{padding:7px}.visual-wrap{height:220px}}
 </style>
 </head>
 <body>
@@ -66,6 +102,14 @@ input:focus-visible,button:focus-visible{outline:2px solid #ff70b3;outline-offse
  <div class="brand"><div class="logo">♫</div><div><h1>AudioTool</h1><p>Your audio workspace</p></div></div>
  <div class="top-actions"><button class="btn light" id="clearBtn">Clear playlist</button><button class="btn" id="importTop">＋ Import audio</button></div>
 </header>
+
+<div class="ribbon">
+ <div class="ribbon-brand"><span class="ribbon-mark">A</span><b>AudioTool</b><span class="ribbon-file" id="fileLabel">No audio loaded</span></div>
+ <nav class="tabs" id="ribbonTabs">
+ <button class="tab active" data-tab="Home">Home</button><button class="tab " data-tab="Edit">Edit</button><button class="tab " data-tab="Levels">Levels</button><button class="tab " data-tab="Effects">Effects</button><button class="tab " data-tab="Tools">Tools</button><button class="tab " data-tab="Voice">Voice</button><button class="tab " data-tab="Export">Export</button><button class="tab " data-tab="Help">Help</button><button class="tab " data-tab="Favorites">Favorites</button>
+ </nav>
+ <div class="toolstrip" id="toolstrip"></div>
+</div>
 <div class="layout">
  <aside class="panel side">
   <div class="section-title">Your library</div>
@@ -103,13 +147,66 @@ input:focus-visible,button:focus-visible{outline:2px solid #ff70b3;outline-offse
 <audio id="audio" preload="metadata"></audio>
 <script>
 const $=id=>document.getElementById(id);
+
+const ribbonTools={
+ Home:[["Import","＋","open"],["Save WAV","↓","save"],["Play / Pause","▶","play"],["Stop","■","stop"],["Previous","|◀","prev"],["Next","▶|","next"],["Undo trim","↶","undo"],["Repeat","↻","loop"]],
+ Edit:[["Cut section","✂","cut"],["Copy section","▣","copy"],["Paste audio","▤","paste"],["Trim selection","⌗","trim"],["Select all","▭","all"],["Preview section","▷","preview"],["Delete track","×","delete"]],
+ Levels:[["Volume up","＋","volup"],["Volume down","－","voldown"],["Mute","◖","mute"],["Normal speed","1×","speed"],["Slower","½","slow"],["Faster","2×","fast"]],
+ Effects:[["Fade in","↗","fadein"],["Fade out","↘","fadeout"],["Normalize","⌁","normalize"],["Reverse","⇄","reverse"],["Echo","〰","echo"],["Reset effects","⟲","resetfx"]],
+ Tools:[["Zoom in","＋","zoomin"],["Zoom out","－","zoomout"],["Go to start","|◀","start"],["Go to end","▶|","end"],["Loop section","↻","loop"],["Keyboard help","⌨","keys"]],
+ Voice:[["Record voice","●","record"],["Monitor","◉","monitor"],["Import recording","＋","open"]],
+ Export:[["Export WAV","↓","save"],["Export selection","⇩","export"],["Export full track","⇩","full"],["Audio details","ⓘ","details"]],
+ Help:[["Keyboard shortcuts","⌨","keys"],["Audio formats","♫","formats"],["About AudioTool","A","about"]],
+ Favorites:[["Play / Pause","▶","play"],["Trim selection","⌗","trim"],["Export WAV","↓","save"],["Repeat","↻","loop"]]
+};
+function showRibbonTab(name){
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+ const strip=$("toolstrip");strip.innerHTML="";
+ ribbonTools[name].forEach((item,i)=>{const [label,ico,action]=item;const b=document.createElement("button");b.className="tool-action"+(["Import","Save WAV","Export WAV"].includes(label)?" primary":"");b.innerHTML='<span class="tool-icon"></span><span></span>';b.querySelector(".tool-icon").textContent=ico;b.querySelector("span:last-child").textContent=label;b.onclick=()=>runRibbonAction(action);strip.append(b)});
+}
+function runRibbonAction(action){
+ const duration=audio.duration||0;
+ switch(action){
+ case "open":$("fileInput").click();break;
+ case "save":case "full":$("trimStart").value=0;$("trimEnd").value=duration;updateTrim();$("exportBtn").click();break;
+ case "export":$("exportBtn").click();break;
+ case "play":audio.paused?play():audio.pause();break;
+ case "stop":audio.pause();audio.currentTime=0;break;
+ case "prev":$("prevBtn").click();break;case "next":$("nextBtn").click();break;
+ case "undo":case "all":case "resetfx":$("resetTrim").click();break;
+ case "loop":$("loopBtn").click();break;
+ case "trim":$("previewTrim").click();break;
+ case "preview":$("previewTrim").click();break;
+ case "volup":audio.volume=Math.min(1,audio.volume+.1);$("volume").value=audio.volume;$("volumeVal").textContent=Math.round(audio.volume*100)+"%";break;
+ case "voldown":audio.volume=Math.max(0,audio.volume-.1);$("volume").value=audio.volume;$("volumeVal").textContent=Math.round(audio.volume*100)+"%";break;
+ case "mute":audio.muted=!audio.muted;setStatus(audio.muted?"MUTED":"UNMUTED");break;
+ case "speed":audio.playbackRate=1;$("speed").value=1;$("speedVal").textContent="1.00×";break;
+ case "slow":audio.playbackRate=Math.max(.5,audio.playbackRate-.25);$("speed").value=audio.playbackRate;$("speedVal").textContent=audio.playbackRate.toFixed(2)+"×";break;
+ case "fast":audio.playbackRate=Math.min(2,audio.playbackRate+.25);$("speed").value=audio.playbackRate;$("speedVal").textContent=audio.playbackRate.toFixed(2)+"×";break;
+ case "start":audio.currentTime=0;break;case "end":audio.currentTime=duration;break;
+ case "zoomin":$("seek").step=Math.max(1,Number($("seek").step||1)/2);setStatus("ZOOM IN · timeline");break;
+ case "zoomout":$("seek").step=1;setStatus("ZOOM RESET");break;
+ case "delete":if(current>=0)removeTrack(current);break;
+ case "cut":case "copy":case "paste":alert("Waveform clipboard editing is coming next. Use Audio trimmer below to select and export a section.");break;
+ case "record":alert("Voice recording is not enabled yet. Import a recording with the Import button.");break;
+ case "monitor":alert("Import audio and press Play to monitor playback.");break;
+ case "fadein":case "fadeout":case "normalize":case "reverse":case "echo":alert("This effect is planned for the next editing update. Your original audio is unchanged.");break;
+ case "details":alert(current<0?"No audio loaded":("File: "+tracks[current].name+"\nDuration: "+duration.toFixed(2)+" seconds\nPlayback rate: "+audio.playbackRate+"×"));break;
+ case "keys":alert("Space: play/pause\nLeft / Right: seek 5 seconds\nUse the ribbon for editing tools.");break;
+ case "formats":alert("Supported imports depend on your browser: MP3, WAV, OGG, M4A, AAC and FLAC. WAV export is built in.");break;
+ case "about":alert("AudioTool — browser-based audio editor.");break;
+ }
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showRibbonTab(b.dataset.tab)));
+showRibbonTab("Home");
+
 const audio=$('audio');let tracks=[],current=-1,urls=[],loop=false,ctx=null,analyser=null,source=null,raf=0,decoded=null,trimPreview=false;
 const fmt=s=>{if(!Number.isFinite(s)||s<0)return '0:00';let m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+String(sec).padStart(2,'0')};
 function setStatus(s){$('status').textContent='● '+s}
 function addFiles(files){[...files].filter(f=>f.type.startsWith('audio/')||/\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(f.name)).forEach(file=>{const url=URL.createObjectURL(file);urls.push(url);tracks.push({file,url,name:file.name});});renderList();if(current<0&&tracks.length)selectTrack(0);$('fileInput').value=''}
 function renderList(){$('count').textContent=tracks.length+' track'+(tracks.length===1?'':'s');$('trackList').innerHTML='';if(!tracks.length){$('trackList').innerHTML='<div class="empty">Your imported tracks will appear here.</div>';return}tracks.forEach((t,i)=>{const el=document.createElement('div');el.className='track'+(i===current?' active':'');el.innerHTML='<div class="track-art">♫</div><div class="track-info"><b></b><small></small></div><button class="remove" title="Remove track">×</button>';el.querySelector('b').textContent=t.name;el.querySelector('small').textContent=t.file?((t.file.size/1048576).toFixed(1)+' MB'):'Audio file';el.addEventListener('click',()=>selectTrack(i));el.querySelector('.remove').addEventListener('click',e=>{e.stopPropagation();removeTrack(i)});$('trackList').append(el)})}
-function selectTrack(i){if(i<0||i>=tracks.length)return;current=i;decoded=null;audio.src=tracks[i].url;audio.load();$('trackName').textContent=tracks[i].name;$('trackMeta').textContent='Loading audio…';$('playBtn').textContent='▶';$('seek').value=0;setStatus('LOADED');renderList();resetTrimUI()}
-function removeTrack(i){const was=current===i;const removed=tracks.splice(i,1)[0];URL.revokeObjectURL(removed.url);urls=urls.filter(u=>u!==removed.url);if(!tracks.length){current=-1;audio.pause();audio.removeAttribute('src');audio.load();$('trackName').textContent='Nothing playing yet';$('trackMeta').textContent='Import audio to get started';decoded=null}else if(was){current=-1;selectTrack(Math.min(i,tracks.length-1))}else if(i<current)current--;renderList()}
+function selectTrack(i){if(i<0||i>=tracks.length)return;current=i;decoded=null;audio.src=tracks[i].url;audio.load();$('trackName').textContent=tracks[i].name;$('fileLabel').textContent=tracks[i].name;$('trackMeta').textContent='Loading audio…';$('playBtn').textContent='▶';$('seek').value=0;setStatus('LOADED');renderList();resetTrimUI()}
+function removeTrack(i){const was=current===i;const removed=tracks.splice(i,1)[0];URL.revokeObjectURL(removed.url);urls=urls.filter(u=>u!==removed.url);if(!tracks.length){current=-1;audio.pause();audio.removeAttribute('src');audio.load();$('trackName').textContent='Nothing playing yet';$('fileLabel').textContent='No audio loaded';$('trackMeta').textContent='Import audio to get started';decoded=null}else if(was){current=-1;selectTrack(Math.min(i,tracks.length-1))}else if(i<current)current--;renderList()}
 function ensureAudioGraph(){if(ctx)return;ctx=new(window.AudioContext||window.webkitAudioContext)();analyser=ctx.createAnalyser();analyser.fftSize=256;source=ctx.createMediaElementSource(audio);source.connect(analyser);analyser.connect(ctx.destination);drawVisualizer()}
 function drawVisualizer(){const canvas=$('visualizer'),c=canvas.getContext('2d');function draw(){raf=requestAnimationFrame(draw);const w=canvas.clientWidth,h=canvas.clientHeight,dpr=window.devicePixelRatio||1;if(canvas.width!==Math.floor(w*dpr)||canvas.height!==Math.floor(h*dpr)){canvas.width=Math.floor(w*dpr);canvas.height=Math.floor(h*dpr)}c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);if(!analyser){c.fillStyle='#777';c.font='12px sans-serif';c.fillText('Import a track and press play',w/2-75,h/2);return}const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(data);const bars= Math.min(90,data.length),gap=3,bw=(w-(bars-1)*gap)/bars;for(let i=0;i<bars;i++){const v=data[i]/255,bar=Math.max(3,v*(h-35));const grad=c.createLinearGradient(0,h-bar,0,h);grad.addColorStop(0,'#ffe16b');grad.addColorStop(1,'#ff8500');c.fillStyle=grad;c.beginPath();c.roundRect(i*(bw+gap),h-bar,bw,bar,4);c.fill()}}draw()}
 function resetTrimUI(){const d=Number.isFinite(audio.duration)?audio.duration:0;$('trimStart').max=d||100;$('trimEnd').max=d||100;$('trimStart').value=0;$('trimEnd').value=d;$('startLabel').textContent='0.0s';$('endLabel').textContent=d.toFixed(1)+'s';$('trimHint').textContent=d?'Full track selected · '+d.toFixed(1)+' seconds':'Waiting for audio metadata'}
