@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#09090e"><title>AudioTool Studio</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#09090e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="AudioTool"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><title>AudioTool Mobile Studio</title>
 <style>
 :root{--pink:#ff4fa3;--yellow:#ffe36a;--bg:#09090e;--panel:#191820;--line:#383541;--text:#f8f4fa;--muted:#aaa4b2}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:14px Inter,system-ui,Arial}button{font:inherit;cursor:pointer;color:inherit}button:focus-visible,input:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
@@ -11,7 +11,7 @@
 .wave-head{height:34px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid #24212b;color:#aaa4b2;font-size:11px;gap:12px}.wave-head strong{color:#eee}.wave-head .spacer{flex:1}
 .wave-scroll{position:relative;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
 .wave-stage{height:100%;min-height:210px;min-width:100%;position:relative;touch-action:none;user-select:none;background-color:#0a0910;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:100% 25%,80px 100%}
-#wave{display:block;width:100%;height:100%;touch-action:pan-y;cursor:crosshair}
+#wave{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .empty-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;pointer-events:none;text-align:center}.empty-state .big{font-size:34px;color:#ff83bd}.empty-state b{font-size:17px}.empty-state small{color:#918b99}
 .selection{position:absolute;top:0;bottom:0;background:#ff70b326;border-left:1px solid var(--pink);border-right:1px solid var(--pink);pointer-events:none;display:none}
 .playhead{position:absolute;top:0;bottom:0;width:2px;background:#ffe36a;box-shadow:0 0 8px #ffe36a88;pointer-events:none;display:none}
@@ -22,9 +22,57 @@
 .bottom-right{display:flex;align-items:center;gap:9px;color:#aaa;font-size:11px}.bottom-right label{display:flex;align-items:center;gap:6px}.bottom-right input{width:75px;accent-color:var(--yellow)}
 input[type=file]{display:none}
 @media(max-width:720px){.app{grid-template-rows:36px 40px 76px minmax(0,1fr) 76px}.tab{padding:0 13px;font-size:12px}.tool{min-width:55px;font-size:10px}.bottom{grid-template-columns:1fr;gap:4px;padding:5px 8px}.transport{justify-content:center}.transport button{height:37px;min-width:38px}.transport .play{min-width:52px}.progress{display:none}.bottom-right{display:none}.wave-head{height:28px}}
+
+.brand-logo{height:30px;width:150px;object-fit:contain;object-position:left center;display:block}
+.install-app{border:1px solid #ff78b8;border-radius:99px;padding:6px 12px;background:linear-gradient(110deg,#ff4fa3,#ffe36a);color:#151019;font-size:11px;font-weight:800}
+@media(max-width:720px){
+ html,body{overscroll-behavior:none}
+ .app{grid-template-rows:48px 42px 78px minmax(0,1fr) 82px}
+ .brandbar{padding:0 12px;gap:8px}
+ .brand-logo{width:124px;height:36px}
+ .filename{font-size:10px;max-width:34vw}
+ .tabs{padding:0 5px;gap:2px}
+ .tab{padding:0 14px;font-size:12px}
+ .ribbon{height:78px;padding:8px 10px;gap:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;scroll-snap-type:x proximity}
+ .ribbon::-webkit-scrollbar{display:none}
+ .tool{min-width:66px;min-height:60px;padding:6px 8px;border-radius:13px;scroll-snap-align:start}
+ .tool .ico{width:27px;height:27px;font-size:17px}
+ .editor{min-height:0}
+ .wave-head{height:34px;padding:0 10px;font-size:10px;gap:8px}
+ .wave-scroll{overflow:hidden}
+ .wave-stage{min-height:150px;background-size:100% 20%,56px 100%}
+ .empty-state{padding:16px}
+ .empty-state b{font-size:15px}
+ .empty-state small{font-size:11px;max-width:260px;line-height:1.5}
+ .ruler{height:22px;font-size:9px;padding:0 7px}
+ .bottom{grid-template-columns:1fr;gap:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#111016}
+ .transport{justify-content:space-between;gap:7px}
+ .transport button{height:52px;min-width:0;flex:1;border-radius:15px;font-size:17px;padding:0 4px}
+ .transport .play{flex:1.35;font-size:23px}
+ .progress{display:block;grid-row:2;margin-top:5px}
+ .times{font-size:10px;margin-bottom:2px}
+ .seek{height:14px}
+ .bottom-right{display:none}
+}
+@media(max-width:390px){
+ .app{grid-template-rows:46px 40px 72px minmax(0,1fr) 78px}
+ .brand-logo{width:108px}
+ .filename{max-width:29vw}
+ .tool{min-width:61px}
+ .transport button{height:47px}
+}
+@media(orientation:landscape) and (max-height:500px){
+ .app{grid-template-rows:38px 34px 62px minmax(0,1fr) 65px}
+ .ribbon{height:62px;padding:4px 8px}
+ .tool{min-height:50px;flex-direction:row}
+ .tool .ico{width:25px;height:25px}
+ .bottom{grid-template-columns:auto minmax(80px,1fr);gap:10px}
+ .progress{display:block}
+ .transport button{height:43px}
+}
 </style></head>
 <body><div class="app">
-<header class="brandbar"><span class="brandmark">A</span><b>AudioTool</b><span class="filename" id="filename">No audio loaded — choose Open to begin</span></header>
+<header class="brandbar"><img class="brand-logo" src="logo.svg" alt="AudioTool logo"><span class="filename" id="filename">No audio loaded — choose Open to begin</span><button class="install-app" id="installApp" hidden>Install</button></header>
 <nav class="tabs" id="tabs"><button class="tab active" data-tab="Home">Home</button><button class="tab" data-tab="Edit">Edit</button><button class="tab" data-tab="Levels">Levels</button><button class="tab" data-tab="Effects">Effects</button><button class="tab" data-tab="Tools">Tools</button><button class="tab" data-tab="Voice">Voice</button><button class="tab" data-tab="Export">Export</button><button class="tab" data-tab="Help">Help</button><button class="tab" data-tab="Favorites">Favorites</button></nav>
 <div class="ribbon" id="ribbon"></div>
 <main class="editor">
@@ -143,4 +191,8 @@ $("record").onclick=record;
 $("tabs").addEventListener("wheel",e=>{if(e.deltaY){e.currentTarget.scrollLeft+=e.deltaY}});
 document.addEventListener("keydown",e=>{if(e.target.matches("input"))return;if(e.code==="Space"){e.preventDefault();audio.paused?play():pause()}if(e.code==="ArrowLeft"&&buffer)audio.currentTime=Math.max(0,audio.currentTime-5);if(e.code==="ArrowRight"&&buffer)audio.currentTime=Math.min(duration(),audio.currentTime+5);if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="o"){$("file").click();e.preventDefault()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){if(buffer)download(buffer,"AudioTool.wav");e.preventDefault()}});
 showTab("Home");drawWave();$("total").textContent=fmt(0);
+let installPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;$("installApp").hidden=false});
+$("installApp").onclick=async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$("installApp").hidden=true};
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 </script></body></html>
