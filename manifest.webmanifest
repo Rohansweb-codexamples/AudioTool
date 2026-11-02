@@ -1,0 +1,19 @@
+{
+  "name": "AudioTool — Mobile Audio Studio",
+  "short_name": "AudioTool",
+  "description": "A touch-friendly audio editor with waveform editing, effects, recording and mixing.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#09090e",
+  "theme_color": "#09090e",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
