@@ -10,7 +10,7 @@
 .editor{min-height:0;display:flex;flex-direction:column;position:relative;background:#0b0a10}
 .wave-head{height:34px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid #24212b;color:#aaa4b2;font-size:11px;gap:12px}.wave-head strong{color:#eee}.wave-head .spacer{flex:1}
 .wave-scroll{position:relative;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
-.wave-stage{height:100%;min-height:210px;min-width:100%;position:relative;background-color:#0a0910;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:100% 25%,80px 100%}
+.wave-stage{height:100%;min-height:210px;min-width:100%;position:relative;touch-action:none;user-select:none;background-color:#0a0910;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:100% 25%,80px 100%}
 #wave{display:block;width:100%;height:100%;touch-action:pan-y;cursor:crosshair}
 .empty-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;pointer-events:none;text-align:center}.empty-state .big{font-size:34px;color:#ff83bd}.empty-state b{font-size:17px}.empty-state small{color:#918b99}
 .selection{position:absolute;top:0;bottom:0;background:#ff70b326;border-left:1px solid var(--pink);border-right:1px solid var(--pink);pointer-events:none;display:none}
@@ -66,7 +66,7 @@ $("waveStage").addEventListener("pointermove",e=>{if(dragging)setSelection(dragS
 $("waveStage").addEventListener("pointerup",e=>{if(!dragging)return;dragging=false;const t=pointerTime(e);if(Math.abs(t-dragStart)<.025){selection=null;audio.currentTime=t;drawOverlays()}else setSelection(dragStart,t)});
 $("waveStage").addEventListener("pointercancel",()=>dragging=false);
 function makeBuffer(channels,length,rate){return new AudioBuffer({numberOfChannels:channels,length,sampleRate:rate})}
-function applyEdit(fn){if(!buffer)return alert("Open an audio file first.");snapshot();const next=fn(buffer);buffer=next;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();selection=null;drawWave();$("total").textContent=fmt(duration());setStatus("Edit applied")}
+function applyEdit(fn){if(!buffer)return alert("Open an audio file first.");snapshot();const next=fn(buffer);buffer=next;history=history.slice(0,historyIndex+1);history.push(buffer);if(history.length>12)history.shift();historyIndex=history.length-1;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();selection=null;drawWave();$("total").textContent=fmt(duration());setStatus("Edit applied")}
 function cutCopy(cut){if(!buffer||!selection)return alert("Drag across the waveform to select audio first.");const s=Math.floor(selection.start*buffer.sampleRate),e=Math.floor(selection.end*buffer.sampleRate);clipboard=makeBuffer(buffer.numberOfChannels,e-s,buffer.sampleRate);for(let c=0;c<buffer.numberOfChannels;c++)clipboard.copyToChannel(buffer.getChannelData(c).slice(s,e),c);if(cut)applyEdit(b=>spliceBuffer(b,s,e,null));}
 function spliceBuffer(b,s,e,insert){const add=insert?insert.length:0,n=b.length-(e-s)+add,out=makeBuffer(b.numberOfChannels,n,b.sampleRate);for(let c=0;c<b.numberOfChannels;c++){const a=b.getChannelData(c),o=out.getChannelData(c);o.set(a.slice(0,s));if(insert)o.set(insert.getChannelData(Math.min(c,insert.numberOfChannels-1)),s);o.set(a.slice(e),s+add)}return out}
 function bufferToWav(b){const ch=b.numberOfChannels,n=b.length,bytes=44+n*ch*2,v=new DataView(new ArrayBuffer(bytes));let p=0;const str=s=>{for(let i=0;i<s.length;i++)v.setUint8(p++,s.charCodeAt(i))};str("RIFF");v.setUint32(p,bytes-8,true);p+=4;str("WAVEfmt ");v.setUint32(p,16,true);p+=4;v.setUint16(p,1,true);p+=2;v.setUint16(p,ch,true);p+=2;v.setUint32(p,b.sampleRate,true);p+=4;v.setUint32(p,b.sampleRate*ch*2,true);p+=4;v.setUint16(p,ch*2,true);p+=2;v.setUint16(p,16,true);p+=2;str("data");v.setUint32(p,n*ch*2,true);p+=4;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){let x=Math.max(-1,Math.min(1,b.getChannelData(c)[i]));v.setInt16(p,x<0?x*32768:x*32767,true);p+=2}return new Blob([v],{type:"audio/wav"})}
@@ -134,7 +134,7 @@ async function mixFile(f){
    const src=incoming.getChannelData(Math.min(ch,incoming.numberOfChannels-1));
    for(let i=0;i<incomingLength;i++){const p=i*incoming.sampleRate/rate,lo=Math.floor(p),hi=Math.min(src.length-1,lo+1),frac=p-lo;dst[at+i]=Math.max(-1,Math.min(1,dst[at+i]+src[lo]*(1-frac)+src[hi]*frac))}
   }
-  buffer=out;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();selection=null;
+  buffer=out;history=history.slice(0,historyIndex+1);history.push(buffer);if(history.length>12)history.shift();historyIndex=history.length-1;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();selection=null;
   $("total").textContent=fmt(duration());drawWave();setFileName((file?.name||"Audio")+" + "+f.name);setStatus("Mix complete · "+fmt(duration()));
  }catch(err){console.error(err);alert("Could not mix this file. Try importing an MP3 or WAV.");setStatus("Mix failed")}
 }
