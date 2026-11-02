@@ -94,8 +94,51 @@ function reloadEdited(){audio.src=URL.createObjectURL(bufferToWav(buffer));audio
 function paste(){if(!buffer||!clipboard)return alert("Copy a waveform selection first.");const at=Math.floor(audio.currentTime*buffer.sampleRate);applyEdit(b=>spliceBuffer(b,at,at,clipboard))}
 function trimTo(){if(!buffer||!selection)return alert("Select a waveform region first.");const s=Math.floor(selection.start*buffer.sampleRate),e=Math.floor(selection.end*buffer.sampleRate);applyEdit(b=>{const out=makeBuffer(b.numberOfChannels,e-s,b.sampleRate);for(let c=0;c<b.numberOfChannels;c++)out.copyToChannel(b.getChannelData(c).slice(s,e),c);return out})}
 function silence(){if(!buffer||!selection)return alert("Select a waveform region first.");applyEdit(b=>{const out=makeBuffer(b.numberOfChannels,b.length,b.sampleRate);for(let c=0;c<b.numberOfChannels;c++){out.copyToChannel(b.getChannelData(c),c);out.getChannelData(c).fill(0,Math.floor(selection.start*b.sampleRate),Math.floor(selection.end*b.sampleRate))}return out})}
-async function record(){try{micStream=await navigator.mediaDevices.getUserMedia({audio:true});recordChunks=[];recorder=new MediaRecorder(micStream);recorder.ondataavailable=e=>{if(e.data.size)recordChunks.push(e.data)};recorder.onstop=()=>{const blob=new Blob(recordChunks,{type:recorder.mimeType||"audio/webm"});const f=new File([blob],"Voice-recording.webm",{type:blob.type});openFile(f);micStream.getTracks().forEach(t=>t.stop());setStatus("Recording imported")};recorder.start();setStatus("Recording microphone…")}catch(e){alert("Microphone access was blocked or is unavailable. Allow microphone permission and try again.")}}
-function stopRecord(){if(recorder&&recorder.state!=="inactive")recorder.stop()}
+let recordContext=null,recordProcessor=null,recordGain=null,recordedChunks=[],micStream=null;
+async function record(){
+ if(recordContext){await stopRecord();return}
+ try{
+  micStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  const AC=window.AudioContext||window.webkitAudioContext;
+  recordContext=new AC();await recordContext.resume();
+  const source=recordContext.createMediaStreamSource(micStream);
+  recordProcessor=recordContext.createScriptProcessor(4096,1,1);
+  recordGain=recordContext.createGain();recordGain.gain.value=0;recordedChunks=[];
+  recordProcessor.onaudioprocess=e=>recordedChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+  source.connect(recordProcessor);recordProcessor.connect(recordGain);recordGain.connect(recordContext.destination);
+  $("record").textContent="■";setStatus("Recording microphone · press Stop to finish");
+ }catch(err){if(micStream)micStream.getTracks().forEach(t=>t.stop());micStream=null;alert("Microphone access failed. Open this site over HTTPS and allow microphone permission.");}
+}
+async function stopRecord(){
+ if(!recordContext)return;
+ const rate=recordContext.sampleRate,total=recordedChunks.reduce((n,a)=>n+a.length,0);
+ if(recordProcessor){recordProcessor.disconnect();recordProcessor.onaudioprocess=null}
+ if(recordGain)recordGain.disconnect();
+ if(micStream)micStream.getTracks().forEach(t=>t.stop());
+ await recordContext.close();recordContext=null;micStream=null;$("record").textContent="●";
+ if(total<1024){setStatus("Recording too short");return}
+ const rec=makeBuffer(1,total,rate);let pos=0;for(const chunk of recordedChunks){rec.getChannelData(0).set(chunk,pos);pos+=chunk.length}
+ buffer=rec;file={name:"Voice-recording.wav"};selection=null;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();
+ history=[];historyIndex=-1;snapshot();setFileName(file.name);$("total").textContent=fmt(duration());drawWave();setStatus("Recording ready · "+fmt(duration()));
+}
+async function mixFile(f){
+ if(!buffer){alert("Open your main audio first, then choose Mix audio.");return}
+ try{
+  setStatus("Preparing mix…");const AC=window.AudioContext||window.webkitAudioContext,ac=new AC();
+  const incoming=await ac.decodeAudioData((await f.arrayBuffer()).slice(0));await ac.close();
+  snapshot();const rate=buffer.sampleRate,at=Math.max(0,Math.floor((selection?selection.start:audio.currentTime)*rate));
+  const incomingLength=Math.ceil(incoming.duration*rate),length=Math.max(buffer.length,at+incomingLength);
+  const channels=Math.max(buffer.numberOfChannels,incoming.numberOfChannels),out=makeBuffer(channels,length,rate);
+  for(let ch=0;ch<channels;ch++){
+   const dst=out.getChannelData(ch),base=buffer.getChannelData(Math.min(ch,buffer.numberOfChannels-1));dst.set(base);
+   const src=incoming.getChannelData(Math.min(ch,incoming.numberOfChannels-1));
+   for(let i=0;i<incomingLength;i++){const p=i*incoming.sampleRate/rate,lo=Math.floor(p),hi=Math.min(src.length-1,lo+1),frac=p-lo;dst[at+i]=Math.max(-1,Math.min(1,dst[at+i]+src[lo]*(1-frac)+src[hi]*frac))}
+  }
+  buffer=out;audio.pause();audio.src=URL.createObjectURL(bufferToWav(buffer));audio.load();selection=null;
+  $("total").textContent=fmt(duration());drawWave();setFileName((file?.name||"Audio")+" + "+f.name);setStatus("Mix complete · "+fmt(duration()));
+ }catch(err){console.error(err);alert("Could not mix this file. Try importing an MP3 or WAV.");setStatus("Mix failed")}
+}
+$("mixFile").onchange=e=>{const f=e.target.files[0];if(f)mixFile(f);e.target.value=""};
 $("record").onclick=record;
 $("tabs").addEventListener("wheel",e=>{if(e.deltaY){e.currentTarget.scrollLeft+=e.deltaY}});
 document.addEventListener("keydown",e=>{if(e.target.matches("input"))return;if(e.code==="Space"){e.preventDefault();audio.paused?play():pause()}if(e.code==="ArrowLeft"&&buffer)audio.currentTime=Math.max(0,audio.currentTime-5);if(e.code==="ArrowRight"&&buffer)audio.currentTime=Math.min(duration(),audio.currentTime+5);if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="o"){$("file").click();e.preventDefault()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){if(buffer)download(buffer,"AudioTool.wav");e.preventDefault()}});
