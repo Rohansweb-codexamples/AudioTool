@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#ff8a00">
+<meta name="theme-color" content="#08080d">
 <title>AudioTool — Audio Studio</title>
 <style>
 :root{--orange:#ff8a00;--yellow:#ffd447;--ink:#171717;--panel:#242424;--muted:#a8a8a8;--line:#383838}
@@ -11,6 +11,53 @@
 button,input{font:inherit}button{cursor:pointer}.shell{max-width:1500px;margin:auto;padding:24px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:15px;background:#171717;color:#ffb21c;display:grid;place-items:center;font-size:23px;box-shadow:0 8px 22px #7c390044}.brand h1{font-size:23px;margin:0;letter-spacing:-.8px}.brand p{margin:2px 0 0;font-size:12px;opacity:.7}.top-actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:700;background:#171717;color:#fff}.btn.light{background:#fff;color:#171717}.btn:disabled{opacity:.4;cursor:not-allowed}.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}.panel{background:#202020;color:#fff;border:1px solid #ffffff1c;border-radius:20px;box-shadow:0 15px 40px #6e310c30;overflow:hidden}.side{padding:18px;min-height:690px}.section-title{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#aaa;font-weight:800;margin:4px 0 13px}.drop{border:1.5px dashed #777;border-radius:16px;padding:24px 12px;text-align:center;background:#ffffff08;transition:.2s}.drop.drag{border-color:#ffb21c;background:#ffb21c18}.drop strong{display:block;margin:9px 0 4px}.drop small{color:#aaa}.add{margin-top:13px;width:100%;background:linear-gradient(100deg,#ff8a00,#ffd447);color:#171717}.track-list{display:flex;flex-direction:column;gap:7px;margin-top:14px;max-height:430px;overflow:auto}.track{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:#ffffff08;border:1px solid transparent;cursor:pointer;min-width:0}.track.active{background:#ffab1b20;border-color:#ffad22}.track-art{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ff8a00,#ffd447);color:#171717;display:grid;place-items:center;font-size:17px;flex:none}.track-info{min-width:0;flex:1}.track-info b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.track-info small{color:#aaa;font-size:11px}.track .remove{border:0;background:none;color:#888;padding:5px}.empty{color:#888;text-align:center;padding:22px 8px;font-size:13px}.workspace{display:flex;flex-direction:column;gap:18px}.hero{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px}.eyebrow{color:#ffb21c;text-transform:uppercase;font-weight:800;letter-spacing:1.5px;font-size:11px}.hero h2{margin:6px 0 5px;font-size:clamp(22px,3vw,32px);letter-spacing:-1px}.hero p{color:#aaa;margin:0;font-size:13px}.status{border:1px solid #4a4a4a;border-radius:99px;padding:8px 12px;color:#ccc;font-size:11px;white-space:nowrap}.studio{padding:22px}.now{display:flex;align-items:center;gap:15px;margin-bottom:22px}.cover{width:74px;height:74px;border-radius:17px;background:linear-gradient(135deg,#ff8500,#ffdc56);display:grid;place-items:center;font-size:32px;color:#171717;flex:none}.now h3{font-size:19px;margin:0 0 5px;overflow-wrap:anywhere}.now p{margin:0;color:#aaa;font-size:12px}.visual-wrap{height:190px;border-radius:15px;background:linear-gradient(180deg,#171717,#1c1c1c);border:1px solid #393939;overflow:hidden;position:relative}.visual-wrap canvas{width:100%;height:100%;display:block}.visual-label{position:absolute;top:12px;left:14px;color:#777;font-size:10px;letter-spacing:1.3px;text-transform:uppercase;pointer-events:none}.timeline{margin-top:18px}.time-row{display:flex;justify-content:space-between;color:#aaa;font-size:11px;margin-bottom:8px}.range{width:100%;accent-color:#ffae19;cursor:pointer}.controls{display:flex;align-items:center;justify-content:center;gap:13px;margin:16px 0 20px}.icon-btn{border:0;background:#ffffff12;color:#fff;width:42px;height:42px;border-radius:50%;font-size:17px}.icon-btn.main{width:58px;height:58px;background:linear-gradient(135deg,#ff8a00,#ffda4b);color:#171717;font-size:22px;box-shadow:0 5px 20px #ff9c0040}.tool-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.tool{padding:13px;background:#ffffff09;border:1px solid #383838;border-radius:13px}.tool label{display:flex;justify-content:space-between;color:#bbb;font-size:11px;margin-bottom:9px}.tool input{width:100%;accent-color:#ffae19}.trim{padding:20px}.trim-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.trim h3{margin:0;font-size:16px}.trim p{color:#999;font-size:12px;margin:5px 0 0}.trim-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.trim-grid label{font-size:11px;color:#bbb}.trim-grid input{display:block;width:100%;margin-top:9px;accent-color:#ffae19}.trim-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.trim-actions .btn{font-size:12px;padding:10px 13px}.hint{font-size:11px;color:#888;margin-top:12px}.footer{text-align:center;color:#542900aa;font-size:11px;padding:17px}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.side{min-height:0}.track-list{max-height:240px}.top{align-items:flex-start}.hero{align-items:flex-start;flex-direction:column}}
 @media(max-width:520px){.shell{padding:12px}.top{flex-direction:column}.top-actions{width:100%}.top-actions .btn{flex:1}.studio{padding:15px}.tool-row{grid-template-columns:1fr}.visual-wrap{height:150px}.trim-grid{grid-template-columns:1fr}.hero{padding:18px}.controls{gap:8px}}
+
+/* WavePad-inspired dark editing theme */
+:root{--pink:#ff4fa3;--yellow:#ffe36a;--ink:#08080d;--panel:#14141c;--muted:#a7a4b1;--line:#30303c}
+html{background:#08080d}
+body{background:#08080d;color:#f6f3fa;min-height:100vh}
+.shell{max-width:1600px;padding:22px}
+.top{margin-bottom:18px}
+.logo{background:linear-gradient(135deg,#ff4fa3,#ffe36a);color:#17121b;border-radius:15px;box-shadow:0 0 24px #ff4fa333}
+.brand h1{color:#fff}.brand p{color:#aaa;opacity:1}
+.panel{background:#14141c;color:#f6f3fa;border:1px solid #30303c;border-radius:18px;box-shadow:0 14px 36px #0008}
+.side{min-height:720px;background:#111118}
+.section-title{color:#b7b2c0}
+.drop{background:#191923;border:1.5px dashed #555363;border-radius:17px}
+.drop.drag{border-color:#ff70b3;background:#ff70b31a}
+.drop small,.track-info small,.hero p,.now p,.trim p{color:#aaa6b3}
+.btn{border:1px solid #3b3946;border-radius:999px;padding:11px 18px;background:#24232e;color:#fff;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+.btn:hover,.icon-btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn:active,.icon-btn:active{transform:scale(.97)}
+.btn.light{background:#22212b;color:#f6f3fa;border-color:#41404c}
+.btn.add,.btn:not(.light){background:linear-gradient(105deg,#ff4fa3 0%,#ff9b8a 48%,#ffe36a 100%);color:#17121b;border:0;box-shadow:0 5px 18px #ff4fa326;font-weight:800}
+.track{background:#1a1a24;border:1px solid #292936;border-radius:14px}
+.track.active{background:#34202f;border-color:#ff70b3;box-shadow:inset 3px 0 #ff70b3}
+.track-art,.cover{background:linear-gradient(135deg,#ff4fa3,#ff9b8a 52%,#ffe36a);color:#17121b}
+.track .remove{border-radius:50%;font-size:18px}
+.hero{background:linear-gradient(115deg,#171720,#111118)}
+.eyebrow{color:#ff83bd}
+.status{background:#1c1c26;border-color:#393846;color:#d5d0dc;border-radius:999px}
+.studio{background:#14141c}
+.visual-wrap{height:240px;background:#09090f;border:1px solid #343341;border-radius:16px}
+.visual-label{color:#8e8998}
+.range,.tool input,.trim-grid input{accent-color:#ff70b3}
+.controls{gap:12px}
+.icon-btn{width:44px;height:44px;border:1px solid #383744;background:#24232e;color:#f8f4fb;border-radius:50%;transition:.16s}
+.icon-btn.main{width:62px;height:62px;background:linear-gradient(135deg,#ff4fa3,#ff9b8a 55%,#ffe36a);color:#17121b;border:0;box-shadow:0 5px 22px #ff4fa333}
+.tool{background:#1a1a24;border:1px solid #32313d;border-radius:15px;padding:14px}
+.tool label{color:#c4bfcb}
+.tool label b{color:#ffe36a}
+.trim{background:#14141c}
+.trim h3{color:#fff}
+.trim-grid label{color:#c7c2cf}
+.trim-actions .btn{font-size:12px}
+.hint{color:#aaa6b3}
+.footer{color:#777381}
+input:focus-visible,button:focus-visible{outline:2px solid #ff70b3;outline-offset:3px}
+@media(max-width:850px){.side{min-height:0}}
+@media(max-width:520px){.shell{padding:12px}.visual-wrap{height:175px}}
+
 </style>
 </head>
 <body>
